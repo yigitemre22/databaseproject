@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Pastahane{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+  <!-- Navbar -->
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="/" class="nav-link">Ana Sayfa</a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Sidebar -->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <a href="/" class="brand-link">
+      <span class="brand-text font-weight-light"><i class="fas fa-birthday-cake mr-2"></i>Pastahane</span>
+    </a>
+    <div class="sidebar">
+      <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column">
+
+          <li class="nav-item">
+            <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">
+              <i class="nav-icon fas fa-tachometer-alt"></i>
+              <p>Dashboard</p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="/satis" class="nav-link {% if request.path == '/satis' %}active{% endif %}">
+              <i class="nav-icon fas fa-shopping-cart"></i>
+              <p>Satışlar</p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="/uretim" class="nav-link {% if request.path == '/uretim' %}active{% endif %}">
+              <i class="nav-icon fas fa-industry"></i>
+              <p>Üretim</p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="/malzemeler" class="nav-link {% if request.path == '/malzeme' %}active{% endif %}">
+              <i class="nav-icon fas fa-boxes"></i>
+              <p>Malzemeler</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/malzeme_hareketleri" class="nav-link {% if request.path == '/malzeme_hareketleri' %}active{% endif %}">
+              <i class="nav-icon fas fa-exchange-alt"></i>
+              <p>Malzeme Hareketleri</p>
+            </a>
+          </li>
+          <li class="nav-item has-treeview {% if request.path in ['/musteri', '/personel', '/tedarikci', '/urun'] %}menu-open{% endif %}">
+            <a href="#" class="nav-link {% if request.path in ['/musteri', '/personel', '/tedarikci', '/urun'] %}active{% endif %}">
+              <i class="nav-icon fas fa-cog"></i>
+              <p>Tanımlar <i class="right fas fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="/urun" class="nav-link {% if request.path == '/urun' %}active{% endif %}">
+                  <i class="nav-icon fas fa-cake-candles"></i>
+                  <p>Ürünler</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/musteri" class="nav-link {% if request.path == '/musteri' %}active{% endif %}">
+                  <i class="nav-icon fas fa-users"></i>
+                  <p>Müşteriler</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/personel" class="nav-link {% if request.path == '/personel' %}active{% endif %}">
+                  <i class="nav-icon fas fa-user-tie"></i>
+                  <p>Personel</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/tedarikci" class="nav-link {% if request.path == '/tedarikci' %}active{% endif %}">
+                  <i class="nav-icon fas fa-truck"></i>
+                  <p>Tedarikçiler</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <div class="content-wrapper">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0">{% block page_title %}{% endblock %}</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="/">Ana Sayfa</a></li>
+              <li class="breadcrumb-item active">{% block breadcrumb %}{% endblock %}</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="container-fluid">
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+
+  <footer class="main-footer">
+    <strong>Pastahane Yönetim Sistemi</strong>
+  </footer>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

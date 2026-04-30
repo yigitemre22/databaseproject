@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block title %}Malzeme Hareketleri | Pastahane{% endblock %}
+{% block page_title %}Malzeme Hareketleri{% endblock %}
+{% block breadcrumb %}Malzeme Hareketleri{% endblock %}
+
+{% block extra_css %}
+<style>
+  .table thead th { background-color: #343a40; color: #fff; }
+  .btn-action { margin: 0 2px; }
+  #formKart { display: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="mb-3">
+  <button class="btn btn-success" onclick="formAc()">
+    <i class="fas fa-plus mr-1"></i> Yeni Hareket Ekle
+  </button>
+</div>
+
+<div class="card card-warning" id="formKart">
+  <div class="card-header">
+    <h3 class="card-title" id="formBaslik">Yeni Hareket</h3>
+    <div class="card-tools">
+      <button class="btn btn-tool" onclick="formKapat()"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+  <div class="card-body">
+    <form id="hareketForm">
+      <input type="hidden" id="hareket_id" name="hareket_id">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Malzeme</label>
+            <select class="form-control" id="malzeme_id" name="malzeme_id" required>
+              <option value="">-- Malzeme Seçin --</option>
+              {% for m in malzemeler %}
+              <option value="{{ m.malzeme_id }}">{{ m.malzeme_ad }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Alış Tarihi</label>
+            <input type="date" class="form-control" id="alis_tarih" name="alis_tarih" required>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Alınan Miktar</label>
+            <input type="number" class="form-control" id="alinan_miktar" name="alinan_miktar" step="0.01" min="0.01" onchange="toplamHesapla()" required>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Birim Fiyat (₺)</label>
+            <input type="number" class="form-control" id="birimfiyat" name="birimfiyat" step="0.01" min="0.01" onchange="toplamHesapla()" required>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Toplam Miktar (₺)</label>
+            <input type="number" class="form-control" id="toplam_miktar" name="toplam_miktar" step="0.01" readonly required>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Tedarikçi</label>
+            <select class="form-control" id="tedarikci_id" name="tedarikci_id" required>
+              <option value="">-- Tedarikçi Seçin --</option>
+              {% for t in tedarikciler %}
+              <option value="{{ t.tedarikci_id }}">{{ t.firma_adi }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" onclick="kaydet()">
+        <i class="fas fa-save mr-1"></i> Kaydet
+      </button>
+      <button type="button" class="btn btn-secondary ml-2" onclick="formKapat()">İptal</button>
+    </form>
+  </div>
+</div>
+
+<div class="card card-primary">
+  <div class="card-header">
+    <h3 class="card-title"><i class="fas fa-list mr-2"></i>Hareket Listesi</h3>
+  </div>
+  <div class="card-body table-responsive p-0">
+    <table class="table table-hover table-striped">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Malzeme</th>
+          <th>Alış Tarihi</th>
+          <th>Alınan Miktar</th>
+          <th>Birim Fiyat</th>
+          <th>Toplam</th>
+          <th>Tedarikçi</th>
+          <th>İşlem</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for h in hareketler %}
+        <tr>
+          <td>{{ h.hareket_id }}</td>
+          <td>{{ h.malzeme_ad }}</td>
+          <td>{{ h.alis_tarih }}</td>
+          <td>{{ h.alinan_miktar }}</td>
+          <td>{{ h.birimfiyat }} ₺</td>
+          <td>{{ h.toplam_miktar }} ₺</td>
+          <td>{{ h.firma_adi }}</td>
+          <td>
+            <button class="btn btn-sm btn-warning btn-action"
+              onclick="duzenle({{ h.hareket_id }}, {{ h.malzeme_id }}, '{{ h.alis_tarih }}', {{ h.alinan_miktar }}, {{ h.birimfiyat }}, {{ h.toplam_miktar }}, {{ h.tedarikci_id }})">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-danger btn-action" onclick="sil({{ h.hareket_id }})">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.getElementById('alis_tarih').valueAsDate = new Date();
+
+  function toplamHesapla() {
+    const miktar = parseFloat(document.getElementById('alinan_miktar').value) || 0;
+    const fiyat = parseFloat(document.getElementById('birimfiyat').value) || 0;
+    document.getElementById('toplam_miktar').value = (miktar * fiyat).toFixed(2);
+  }
+
+  function formAc() {
+    document.getElementById('formKart').style.display = 'block';
+    document.getElementById('formBaslik').innerText = 'Yeni Hareket';
+    document.getElementById('hareketForm').reset();
+    document.getElementById('alis_tarih').valueAsDate = new Date();
+    document.getElementById('hareket_id').value = '';
+  }
+
+  function formKapat() {
+    document.getElementById('formKart').style.display = 'none';
+  }
+
+  function kaydet() {
+    const hareket_id = document.getElementById('hareket_id').value;
+    const data = {
+      malzeme_id: document.getElementById('malzeme_id').value,
+      alis_tarih: document.getElementById('alis_tarih').value,
+      alinan_miktar: document.getElementById('alinan_miktar').value,
+      birimfiyat: document.getElementById('birimfiyat').value,
+      toplam_miktar: document.getElementById('toplam_miktar').value,
+      tedarikci_id: document.getElementById('tedarikci_id').value
+    };
+
+    const url = hareket_id ? '/malzeme_hareketleri/guncelle/' + hareket_id : '/malzeme_hareketleri/ekle';
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res.success) {
+        alert(hareket_id ? 'Hareket güncellendi!' : 'Hareket eklendi!');
+        location.reload();
+      } else {
+        alert('Hata: ' + res.message);
+      }
+    });
+  }
+
+  function duzenle(id, malzeme_id, alis_tarih, alinan_miktar, birimfiyat, toplam_miktar, tedarikci_id) {
+    document.getElementById('formKart').style.display = 'block';
+    document.getElementById('formBaslik').innerText = 'Hareket Güncelle';
+    document.getElementById('hareket_id').value = id;
+    document.getElementById('malzeme_id').value = malzeme_id;
+    document.getElementById('alis_tarih').value = alis_tarih;
+    document.getElementById('alinan_miktar').value = alinan_miktar;
+    document.getElementById('birimfiyat').value = birimfiyat;
+    document.getElementById('toplam_miktar').value = toplam_miktar;
+    document.getElementById('tedarikci_id').value = tedarikci_id;
+  }
+
+  function sil(id) {
+    if (confirm('Bu hareketi silmek istediğinize emin misiniz?')) {
+      fetch('/malzeme_hareketleri/sil/' + id, { method: 'POST' })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          alert('Hareket silindi!');
+          location.reload();
+        } else {
+          alert('Hata: ' + res.message);
+        }
+      });
+    }
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+
+{% block title %}Üretim | Pastahane{% endblock %}
+{% block page_title %}Üretim{% endblock %}
+{% block breadcrumb %}Üretim{% endblock %}
+
+{% block extra_css %}
+<style>
+  .table thead th { background-color: #343a40; color: #fff; }
+  .btn-action { margin: 0 2px; }
+  #formKart { display: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="mb-3">
+  <button class="btn btn-success" onclick="formAc()">
+    <i class="fas fa-plus mr-1"></i> Yeni Üretim Ekle
+  </button>
+</div>
+
+<div class="card card-warning" id="formKart">
+  <div class="card-header">
+    <h3 class="card-title" id="formBaslik">Yeni Üretim</h3>
+    <div class="card-tools">
+      <button class="btn btn-tool" onclick="formKapat()"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+  <div class="card-body">
+    <form id="uretimForm">
+      <input type="hidden" id="uretim_id" name="uretim_id">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Ürün</label>
+            <select class="form-control" id="urun_id" name="urun_id" onchange="urunSec(this)" required>
+              <option value="">-- Ürün Seçin --</option>
+              {% for urun in urunler %}
+              <option value="{{ urun.urun_id }}" data-ad="{{ urun.urun_adi }}">
+                {{ urun.urun_adi }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Ürün Adı</label>
+            <input type="text" class="form-control" id="urun_adi" name="urun_adi" readonly required>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Üretim Miktarı</label>
+            <input type="number" class="form-control" id="uretim_miktari" name="uretim_miktari" step="0.01" min="0.01" required>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Malzeme</label>
+            <select class="form-control" id="malzeme_id" name="malzeme_id" onchange="malzemeSec(this)" required>
+              <option value="">-- Malzeme Seçin --</option>
+              {% for m in malzemeler %}
+              <option value="{{ m.malzeme_id }}" data-ad="{{ m.malzeme_ad }}">
+                {{ m.malzeme_ad }} (Stok: {{ m.malzeme_stok }})
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Malzeme Adı</label>
+            <input type="text" class="form-control" id="malzeme_adi" name="malzeme_adi" readonly required>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Malzeme Miktarı</label>
+            <input type="number" class="form-control" id="malzeme_miktar" name="malzeme_miktar" step="0.01" min="0.01" required>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" onclick="kaydet()">
+        <i class="fas fa-save mr-1"></i> Kaydet
+      </button>
+      <button type="button" class="btn btn-secondary ml-2" onclick="formKapat()">İptal</button>
+    </form>
+  </div>
+</div>
+
+<div class="card card-primary">
+  <div class="card-header">
+    <h3 class="card-title"><i class="fas fa-list mr-2"></i>Üretim Listesi</h3>
+  </div>
+  <div class="card-body table-responsive p-0">
+    <table class="table table-hover table-striped">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Ürün</th>
+          <th>Malzeme</th>
+          <th>Malzeme Miktarı</th>
+          <th>Üretim Miktarı</th>
+          <th>İşlem</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in uretimler %}
+        <tr>
+          <td>{{ u.uretim_id }}</td>
+          <td>{{ u.urun_adi }}</td>
+          <td>{{ u.malzeme_adi }}</td>
+          <td>{{ u.malzeme_miktar }}</td>
+          <td>{{ u.uretim_miktari }}</td>
+          <td>
+            <button class="btn btn-sm btn-warning btn-action"
+              onclick="duzenle({{ u.uretim_id }}, {{ u.urun_id }}, '{{ u.urun_adi }}', {{ u.malzeme_id }}, '{{ u.malzeme_adi }}', {{ u.malzeme_miktar }}, {{ u.uretim_miktari }})">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-danger btn-action" onclick="sil({{ u.uretim_id }})">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function formAc() {
+    document.getElementById('formKart').style.display = 'block';
+    document.getElementById('formBaslik').innerText = 'Yeni Üretim';
+    document.getElementById('uretimForm').reset();
+    document.getElementById('uretim_id').value = '';
+  }
+
+  function formKapat() {
+    document.getElementById('formKart').style.display = 'none';
+  }
+
+  function urunSec(sel) {
+    const opt = sel.options[sel.selectedIndex];
+    document.getElementById('urun_adi').value = opt.dataset.ad || '';
+  }
+
+  function malzemeSec(sel) {
+    const opt = sel.options[sel.selectedIndex];
+    document.getElementById('malzeme_adi').value = opt.dataset.ad || '';
+  }
+
+  function kaydet() {
+    const uretim_id = document.getElementById('uretim_id').value;
+    const data = {
+      urun_id: document.getElementById('urun_id').value,
+      urun_adi: document.getElementById('urun_adi').value,
+      malzeme_id: document.getElementById('malzeme_id').value,
+      malzeme_adi: document.getElementById('malzeme_adi').value,
+      malzeme_miktar: document.getElementById('malzeme_miktar').value,
+      uretim_miktari: document.getElementById('uretim_miktari').value
+    };
+
+    const url = uretim_id ? '/uretim/guncelle/' + uretim_id : '/uretim/ekle';
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res.success) {
+        alert(uretim_id ? 'Üretim güncellendi!' : 'Üretim eklendi!');
+        location.reload();
+      } else {
+        alert('Hata: ' + res.message);
+      }
+    });
+  }
+
+  function duzenle(id, urun_id, urun_adi, malzeme_id, malzeme_adi, malzeme_miktar, uretim_miktari) {
+    document.getElementById('formKart').style.display = 'block';
+    document.getElementById('formBaslik').innerText = 'Üretim Güncelle';
+    document.getElementById('uretim_id').value = id;
+    document.getElementById('urun_id').value = urun_id;
+    document.getElementById('urun_adi').value = urun_adi;
+    document.getElementById('malzeme_id').value = malzeme_id;
+    document.getElementById('malzeme_adi').value = malzeme_adi;
+    document.getElementById('malzeme_miktar').value = malzeme_miktar;
+    document.getElementById('uretim_miktari').value = uretim_miktari;
+  }
+
+  function sil(id) {
+    if (confirm('Bu üretim kaydını silmek istediğinize emin misiniz?')) {
+      fetch('/uretim/sil/' + id, { method: 'POST' })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          alert('Üretim silindi!');
+          location.reload();
+        } else {
+          alert('Hata: ' + res.message);
+        }
+      });
+    }
+  }
+</script>
+{% endblock %}

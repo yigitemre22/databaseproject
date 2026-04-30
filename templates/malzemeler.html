@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Malzemeler | Pastahane{% endblock %}
+{% block page_title %}Malzemeler{% endblock %}
+{% block breadcrumb %}Malzemeler{% endblock %}
+
+{% block extra_css %}
+<style>
+  .table thead th { background-color: #343a40; color: #fff; }
+  .btn-action { margin: 0 2px; }
+  #formKart { display: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="mb-3">
+  <button class="btn btn-success" onclick="formAc()">
+    <i class="fas fa-plus mr-1"></i> Yeni Malzeme Ekle
+  </button>
+</div>
+
+<div class="card card-warning" id="formKart">
+  <div class="card-header">
+    <h3 class="card-title" id="formBaslik">Yeni Malzeme</h3>
+    <div class="card-tools">
+      <button class="btn btn-tool" onclick="formKapat()"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+  <div class="card-body">
+    <form id="malzemeForm">
+      <input type="hidden" id="malzeme_id" name="malzeme_id">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Malzeme Adı</label>
+            <input type="text" class="form-control" id="malzeme_ad" name="malzeme_ad" required>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Stok</label>
+            <input type="number" class="form-control" id="malzeme_stok" name="malzeme_stok" step="0.01" min="0" required>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Fiyat (₺)</label>
+            <input type="number" class="form-control" id="malzeme_fiyat" name="malzeme_fiyat" step="0.01" min="0" required>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="form-group">
+            <label>Notlar</label>
+            <input type="text" class="form-control" id="malzeme_notlar" name="malzeme_notlar">
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" onclick="kaydet()">
+        <i class="fas fa-save mr-1"></i> Kaydet
+      </button>
+      <button type="button" class="btn btn-secondary ml-2" onclick="formKapat()">İptal</button>
+    </form>
+  </div>
+</div>
+
+<div class="card card-primary">
+  <div class="card-header">
+    <h3 class="card-title"><i class="fas fa-list mr-2"></i>Malzeme Listesi</h3>
+  </div>
+  <div class="card-body table-responsive p-0">
+    <table class="table table-hover table-striped">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Malzeme Adı</th>
+          <th>Stok</th>
+          <th>Fiyat</th>
+          <th>Notlar</th>
+          <th>İşlem</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in malzemeler %}
+        <tr>
+          <td>{{ m.malzeme_id }}</td>
+          <td>{{ m.malzeme_ad }}</td>
+          <td>{{ m.malzeme_stok }}</td>
+          <td>{{ m.malzeme_fiyat }} ₺</td>
+          <td>{{ m.malzeme_notlar }}</td>
+          <td>
+            <button class="btn btn-sm btn-warning btn-action"
+              onclick="duzenle({{ m.malzeme_id }}, '{{ m.malzeme_ad }}', {{ m.malzeme_stok }}, {{ m.malzeme_fiyat }}, '{{ m.malzeme_notlar }}')">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-danger btn-action" onclick="sil({{ m.malzeme_id }})">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function formAc() {
+    document.getElementById('formKart').style.display = 'block';
+    document.getElementById('formBaslik').innerText = 'Yeni Malzeme';
+    document.getElementById('malzemeForm').reset();
+    document.getElementById('malzeme_id').value = '';
+  }
+
+  function formKapat() {
+    document.getElementById('formKart').style.display = 'none';
+  }
+
+  function kaydet() {
+    const malzeme_id = document.getElementById('malzeme_id').value;
+    const data = {
+      malzeme_ad: document.getElementById('malzeme_ad').value,
+      malzeme_stok: document.getElementById('malzeme_stok').value,
+      malzeme_fiyat: document.getElementById('malzeme_fiyat').value,
+      malzeme_notlar: document.getElementById('malzeme_notlar').value
+    };
+
+    const url = malzeme_id ? '/malzemeler/guncelle/' + malzeme_id : '/malzemeler/ekle';
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res.success) {
+        alert(malzeme_id ? 'Malzeme güncellendi!' : 'Malzeme eklendi!');
+        location.reload();
+      } else {
+        alert('Hata: ' + res.message);
+      }
+    });
+  }
+
+  function duzenle(id, ad, stok, fiyat, notlar) {
+    document.getElementById('formKart').style.display = 'block';
+    document.getElementById('formBaslik').innerText = 'Malzeme Güncelle';
+    document.getElementById('malzeme_id').value = id;
+    document.getElementById('malzeme_ad').value = ad;
+    document.getElementById('malzeme_stok').value = stok;
+    document.getElementById('malzeme_fiyat').value = fiyat;
+    document.getElementById('malzeme_notlar').value = notlar;
+  }
+
+  function sil(id) {
+    if (confirm('Bu malzemeyi silmek istediğinize emin misiniz?')) {
+      fetch('/malzemeler/sil/' + id, { method: 'POST' })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          alert('Malzeme silindi!');
+          location.reload();
+        } else {
+          alert('Hata: ' + res.message);
+        }
+      });
+    }
+  }
+</script>
+{% endblock %}
