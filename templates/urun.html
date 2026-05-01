@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+
+{% block title %}Ürünler | Pastahane{% endblock %}
+{% block page_title %}Ürünler{% endblock %}
+{% block breadcrumb %}Ürünler{% endblock %}
+
+{% block extra_css %}
+<style>
+  .table thead th { background-color: #343a40; color: #fff; }
+  .btn-action { margin: 0 2px; }
+  #formKart { display: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="mb-3">
+  <button class="btn btn-success" onclick="formAc()">
+    <i class="fas fa-plus mr-1"></i> Yeni Ürün Ekle
+  </button>
+</div>
+
+<div class="card card-warning" id="formKart">
+  <div class="card-header">
+    <h3 class="card-title" id="formBaslik">Yeni Ürün</h3>
+    <div class="card-tools">
+      <button class="btn btn-tool" onclick="formKapat()"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+  <div class="card-body">
+    <form id="urunForm">
+      <input type="hidden" id="urun_id" name="urun_id">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Ürün Adı</label>
+            <input type="text" class="form-control" id="urun_adi" name="urun_adi" required>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Maliyet (₺)</label>
+            <input type="number" class="form-control" id="maliyet" name="maliyet" step="0.01" min="0">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Satış Fiyatı (₺)</label>
+            <input type="number" class="form-control" id="satis_fiyat" name="satis_fiyat" step="0.01" min="0">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Stok</label>
+            <input type="number" class="form-control" id="stok" name="stok" step="0.01" min="0">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Notlar</label>
+            <input type="text" class="form-control" id="notlar" name="notlar">
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" onclick="kaydet()">
+        <i class="fas fa-save mr-1"></i> Kaydet
+      </button>
+      <button type="button" class="btn btn-secondary ml-2" onclick="formKapat()">İptal</button>
+    </form>
+  </div>
+</div>
+
+<div class="card card-primary">
+  <div class="card-header">
+    <h3 class="card-title"><i class="fas fa-list mr-2"></i>Ürün Listesi</h3>
+  </div>
+  <div class="card-body table-responsive p-0">
+    <table class="table table-hover table-striped">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Ürün Adı</th>
+          <th>Maliyet</th>
+          <th>Satış Fiyatı</th>
+          <th>Kar Oranı</th>
+          <th>Stok</th>
+          <th>Notlar</th>
+          <th>İşlem</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in urunler %}
+        <tr>
+          <td>{{ u.urun_id }}</td>
+          <td>{{ u.urun_adi }}</td>
+          <td>{{ u.maliyet }} ₺</td>
+          <td>{{ u.satis_fiyat }} ₺</td>
+          <td>%{{ u.kar_orani }}</td>
+          <td>{{ u.stok }}</td>
+          <td>{{ u.notlar }}</td>
+          <td>
+            <button class="btn btn-sm btn-warning btn-action"
+              onclick="duzenle({{ u.urun_id }}, '{{ u.urun_adi }}', {{ u.maliyet }}, {{ u.satis_fiyat }}, {{ u.kar_orani }}, {{ u.stok }}, '{{ u.notlar }}')">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-danger btn-action" onclick="sil({{ u.urun_id }})">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function formAc() {
+    document.getElementById('formKart').style.display = 'block';
+    document.getElementById('formBaslik').innerText = 'Yeni Ürün';
+    document.getElementById('urunForm').reset();
+    document.getElementById('urun_id').value = '';
+  }
+
+  function formKapat() {
+    document.getElementById('formKart').style.display = 'none';
+  }
+
+  function kaydet() {
+    const urun_id = document.getElementById('urun_id').value;
+    const data = {
+      urun_adi: document.getElementById('urun_adi').value,
+      maliyet: document.getElementById('maliyet').value,
+      satis_fiyat: document.getElementById('satis_fiyat').value,
+      stok: document.getElementById('stok').value,
+      notlar: document.getElementById('notlar').value
+    };
+
+    const url = urun_id ? '/urun/guncelle/' + urun_id : '/urun/ekle';
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res.success) {
+        alert(urun_id ? 'Ürün güncellendi!' : 'Ürün eklendi!');
+        location.reload();
+      } else {
+        alert('Hata: ' + res.message);
+      }
+    });
+  }
+
+  function duzenle(id, urun_adi, maliyet, satis_fiyat, kar_orani, stok, notlar) {
+    document.getElementById('formKart').style.display = 'block';
+    document.getElementById('formBaslik').innerText = 'Ürün Güncelle';
+    document.getElementById('urun_id').value = id;
+    document.getElementById('urun_adi').value = urun_adi;
+    document.getElementById('maliyet').value = maliyet;
+    document.getElementById('satis_fiyat').value = satis_fiyat;
+    document.getElementById('kar_orani').value = kar_orani;
+    document.getElementById('stok').value = stok;
+    document.getElementById('notlar').value = notlar;
+  }
+
+  function sil(id) {
+    if (confirm('Bu ürünü silmek istediğinize emin misiniz?')) {
+      fetch('/urun/sil/' + id, { method: 'POST' })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          alert('Ürün silindi!');
+          location.reload();
+        } else {
+          alert('Hata: ' + res.message);
+        }
+      });
+    }
+  }
+</script>
+{% endblock %}

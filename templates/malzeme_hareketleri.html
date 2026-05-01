@@ -94,7 +94,6 @@
     <table class="table table-hover table-striped">
       <thead>
         <tr>
-          <th>#</th>
           <th>Malzeme</th>
           <th>Alış Tarihi</th>
           <th>Alınan Miktar</th>
@@ -107,8 +106,7 @@
       <tbody>
         {% for h in hareketler %}
         <tr>
-          <td>{{ h.hareket_id }}</td>
-          <td>{{ h.malzeme_ad }}</td>
+         <td>{{ h.malzeme_ad }}</td>
           <td>{{ h.alis_tarih }}</td>
           <td>{{ h.alinan_miktar }}</td>
           <td>{{ h.birimfiyat }} ₺</td>

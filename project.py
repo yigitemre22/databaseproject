@@ -3,6 +3,10 @@ from routes.satis import satis_bp
 from routes.uretim import uretim_bp
 from routes.malzemeler import malzemeler_bp
 from routes.malzeme_hareketleri import malzemele_hareketleri_bp
+from routes.urun import urun_bp
+from routes.musteriler import musteriler_bp
+from routes.personel import personel_bp
+from routes.tedarikci import tedarikci_bp
 import os
  
 app = Flask(__name__, 
@@ -15,6 +19,10 @@ app.register_blueprint(satis_bp)
 app.register_blueprint(uretim_bp)
 app.register_blueprint(malzemeler_bp)
 app.register_blueprint(malzemele_hareketleri_bp)
+app.register_blueprint(urun_bp)
+app.register_blueprint(musteriler_bp)
+app.register_blueprint(personel_bp)
+app.register_blueprint(tedarikci_bp)
 @app.route('/')
 def index():
     return render_template('index.html')

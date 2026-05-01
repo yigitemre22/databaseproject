@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}Müşteriler | Pastahane{% endblock %}
+{% block page_title %}Müşteriler{% endblock %}
+{% block breadcrumb %}Müşteriler{% endblock %}
+
+{% block extra_css %}
+<style>
+  .table thead th { background-color: #343a40; color: #fff; }
+  .btn-action { margin: 0 2px; }
+  #formKart { display: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="mb-3">
+  <button class="btn btn-success" onclick="formAc()">
+    <i class="fas fa-plus mr-1"></i> Yeni Müşteri Ekle
+  </button>
+</div>
+
+<div class="card card-warning" id="formKart">
+  <div class="card-header">
+    <h3 class="card-title" id="formBaslik">Yeni Müşteri</h3>
+    <div class="card-tools">
+      <button class="btn btn-tool" onclick="formKapat()"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+  <div class="card-body">
+    <form id="musteriForm">
+      <input type="hidden" id="musteri_id" name="musteri_id">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Adı</label>
+            <input type="text" class="form-control" id="musteri_adi" name="musteri_adi" required>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Soyadı</label>
+            <input type="text" class="form-control" id="musteri_soyadi" name="musteri_soyadi" required>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Telefon</label>
+            <input type="text" class="form-control" id="musteri_telefon" name="musteri_telefon" maxlength="11">
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" onclick="kaydet()">
+        <i class="fas fa-save mr-1"></i> Kaydet
+      </button>
+      <button type="button" class="btn btn-secondary ml-2" onclick="formKapat()">İptal</button>
+    </form>
+  </div>
+</div>
+
+<div class="card card-primary">
+  <div class="card-header">
+    <h3 class="card-title"><i class="fas fa-list mr-2"></i>Müşteri Listesi</h3>
+  </div>
+  <div class="card-body table-responsive p-0">
+    <table class="table table-hover table-striped">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Adı</th>
+          <th>Soyadı</th>
+          <th>Telefon</th>
+          <th>İşlem</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in musteriler %}
+        <tr>
+          <td>{{ m.musteri_id }}</td>
+          <td>{{ m.musteri_adi }}</td>
+          <td>{{ m.musteri_soyadi }}</td>
+          <td>{{ m.musteri_telefon }}</td>
+          <td>
+            <button class="btn btn-sm btn-warning btn-action"
+              onclick="duzenle({{ m.musteri_id }}, '{{ m.musteri_adi }}', '{{ m.musteri_soyadi }}', '{{ m.musteri_telefon }}')">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-danger btn-action" onclick="sil({{ m.musteri_id }})">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function formAc() {
+    document.getElementById('formKart').style.display = 'block';
+    document.getElementById('formBaslik').innerText = 'Yeni Müşteri';
+    document.getElementById('musteriForm').reset();
+    document.getElementById('musteri_id').value = '';
+  }
+
+  function formKapat() {
+    document.getElementById('formKart').style.display = 'none';
+  }
+
+  function kaydet() {
+    const musteri_id = document.getElementById('musteri_id').value;
+    const data = {
+      musteri_adi: document.getElementById('musteri_adi').value,
+      musteri_soyadi: document.getElementById('musteri_soyadi').value,
+      musteri_telefon: document.getElementById('musteri_telefon').value
+    };
+
+    const url = musteri_id ? '/musteriler/guncelle/' + musteri_id : '/musteriler/ekle';
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res.success) {
+        alert(musteri_id ? 'Müşteri güncellendi!' : 'Müşteri eklendi!');
+        location.reload();
+      } else {
+        alert('Hata: ' + res.message);
+      }
+    });
+  }
+
+  function duzenle(id, adi, soyadi, telefon) {
+    document.getElementById('formKart').style.display = 'block';
+    document.getElementById('formBaslik').innerText = 'Müşteri Güncelle';
+    document.getElementById('musteri_id').value = id;
+    document.getElementById('musteri_adi').value = adi;
+    document.getElementById('musteri_soyadi').value = soyadi;
+    document.getElementById('musteri_telefon').value = telefon;
+  }
+
+  function sil(id) {
+    if (confirm('Bu müşteriyi silmek istediğinize emin misiniz?')) {
+      fetch('/musteriler/sil/' + id, { method: 'POST' })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          alert('Müşteri silindi!');
+          location.reload();
+        } else {
+          alert('Hata: ' + res.message);
+        }
+      });
+    }
+  }
+</script>
+{% endblock %}

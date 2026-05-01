@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Personel | Pastahane{% endblock %}
+{% block page_title %}Personel{% endblock %}
+{% block breadcrumb %}Personel{% endblock %}
+
+{% block extra_css %}
+<style>
+  .table thead th { background-color: #343a40; color: #fff; }
+  .btn-action { margin: 0 2px; }
+  #formKart { display: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="mb-3">
+  <button class="btn btn-success" onclick="formAc()">
+    <i class="fas fa-plus mr-1"></i> Yeni Personel Ekle
+  </button>
+</div>
+
+<div class="card card-warning" id="formKart">
+  <div class="card-header">
+    <h3 class="card-title" id="formBaslik">Yeni Personel</h3>
+    <div class="card-tools">
+      <button class="btn btn-tool" onclick="formKapat()"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+  <div class="card-body">
+    <form id="personelForm">
+      <input type="hidden" id="personel_id" name="personel_id">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Adı</label>
+            <input type="text" class="form-control" id="personel_ad" name="personel_ad" required>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Şifre</label>
+            <input type="password" class="form-control" id="personel_sifre" name="personel_sifre" required>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" onclick="kaydet()">
+        <i class="fas fa-save mr-1"></i> Kaydet
+      </button>
+      <button type="button" class="btn btn-secondary ml-2" onclick="formKapat()">İptal</button>
+    </form>
+  </div>
+</div>
+
+<div class="card card-primary">
+  <div class="card-header">
+    <h3 class="card-title"><i class="fas fa-list mr-2"></i>Personel Listesi</h3>
+  </div>
+  <div class="card-body table-responsive p-0">
+    <table class="table table-hover table-striped">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Adı</th>
+          <th>İşlem</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in personeller %}
+        <tr>
+          <td>{{ p.personel_id }}</td>
+          <td>{{ p.personel_ad }}</td>
+          <td>
+            <button class="btn btn-sm btn-warning btn-action"
+              onclick="duzenle({{ p.personel_id }}, '{{ p.personel_ad }}')">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-danger btn-action" onclick="sil({{ p.personel_id }})">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function formAc() {
+    document.getElementById('formKart').style.display = 'block';
+    document.getElementById('formBaslik').innerText = 'Yeni Personel';
+    document.getElementById('personelForm').reset();
+    document.getElementById('personel_id').value = '';
+  }
+
+  function formKapat() {
+    document.getElementById('formKart').style.display = 'none';
+  }
+
+  function kaydet() {
+    const personel_id = document.getElementById('personel_id').value;
+    const data = {
+      personel_ad: document.getElementById('personel_ad').value,
+      personel_sifre: document.getElementById('personel_sifre').value
+    };
+
+    const url = personel_id ? '/personel/guncelle/' + personel_id : '/personel/ekle';
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res.success) {
+        alert(personel_id ? 'Personel güncellendi!' : 'Personel eklendi!');
+        location.reload();
+      } else {
+        alert('Hata: ' + res.message);
+      }
+    });
+  }
+
+  function duzenle(id, ad) {
+    document.getElementById('formKart').style.display = 'block';
+    document.getElementById('formBaslik').innerText = 'Personel Güncelle';
+    document.getElementById('personel_id').value = id;
+    document.getElementById('personel_ad').value = ad;
+    document.getElementById('personel_sifre').value = '';
+  }
+
+  function sil(id) {
+    if (confirm('Bu personeli silmek istediğinize emin misiniz?')) {
+      fetch('/personel/sil/' + id, { method: 'POST' })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          alert('Personel silindi!');
+          location.reload();
+        } else {
+          alert('Hata: ' + res.message);
+        }
+      });
+    }
+  }
+</script>
+{% endblock %}

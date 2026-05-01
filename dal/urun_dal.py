@@ -7,14 +7,14 @@ def urun_listele():
         return result.fetchall()
     return []
 
-def urun_ekle(maliyet,satis_fiyat,stok,notlar):
+def urun_ekle(urun_adi,maliyet,satis_fiyat,stok,notlar):
     cursor=get_cursor()
-    cursor.callproc('urun_ekle',[maliyet,satis_fiyat,stok,notlar])
+    cursor.callproc('urun_ekle',[urun_adi,maliyet,satis_fiyat,stok,notlar])
     db.commit()
 
-def urun_guncelle(urun_id,maliyet,satis_fiyat,stok,notlar):
+def urun_guncelle(urun_id,urun_adi,maliyet,satis_fiyat,stok,notlar):
     cursor=get_cursor()
-    cursor.callproc('urun_guncelle',[urun_id,maliyet,satis_fiyat,stok,notlar])
+    cursor.callproc('urun_guncelle',[urun_id,urun_adi,maliyet,satis_fiyat,stok,notlar])
     db.commit()
 
 def urun_sil(urun_id):

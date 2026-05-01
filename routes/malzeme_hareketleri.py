@@ -2,11 +2,15 @@ from flask import Blueprint,render_template,request,jsonify
 import businesslayer.malzeme_hareketleri_bl as malzemele_hareketleri_bl
 
 malzemele_hareketleri_bp=Blueprint('malzeme_hareketleri',__name__)
-
 @malzemele_hareketleri_bp.route('/malzeme_hareketleri')
-def hareket_listele():
-    hareket_listesi=malzemele_hareketleri_bl.hareket_listele()
-    return render_template('malzeme_hareketleri.html',hareketler=hareket_listesi)
+def malzeme_listele():
+    hareket_listesi = malzemele_hareketleri_bl.hareket_listele()
+    malzeme_listesi = malzemele_hareketleri_bl.malzemele_listele()
+    tedarikci_listesi = malzemele_hareketleri_bl.tedarikci_listele()
+    return render_template('malzeme_hareketleri.html',
+                           hareketler=hareket_listesi,
+                           malzemeler=malzeme_listesi,
+                           tedarikciler=tedarikci_listesi)
 
 @malzemele_hareketleri_bp.route('/malzeme_hareketleri/ekle',methods=['POST'])
 def hareket_ekle():

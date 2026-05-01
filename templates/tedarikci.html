@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Tedarikçiler | Pastahane{% endblock %}
+{% block page_title %}Tedarikçiler{% endblock %}
+{% block breadcrumb %}Tedarikçiler{% endblock %}
+
+{% block extra_css %}
+<style>
+  .table thead th { background-color: #343a40; color: #fff; }
+  .btn-action { margin: 0 2px; }
+  #formKart { display: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="mb-3">
+  <button class="btn btn-success" onclick="formAc()">
+    <i class="fas fa-plus mr-1"></i> Yeni Tedarikçi Ekle
+  </button>
+</div>
+
+<div class="card card-warning" id="formKart">
+  <div class="card-header">
+    <h3 class="card-title" id="formBaslik">Yeni Tedarikçi</h3>
+    <div class="card-tools">
+      <button class="btn btn-tool" onclick="formKapat()"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+  <div class="card-body">
+    <form id="tedarikcilForm">
+      <input type="hidden" id="tedarikci_id" name="tedarikci_id">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Firma Adı</label>
+            <input type="text" class="form-control" id="firma_adi" name="firma_adi" required>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>İletişim Kişisi</label>
+            <input type="text" class="form-control" id="iletisim_kisi" name="iletisim_kisi" required>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Telefon</label>
+            <input type="text" class="form-control" id="firma_telefon" name="firma_telefon" maxlength="15" required>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Adres</label>
+            <input type="text" class="form-control" id="firma_adres" name="firma_adres" required>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" onclick="kaydet()">
+        <i class="fas fa-save mr-1"></i> Kaydet
+      </button>
+      <button type="button" class="btn btn-secondary ml-2" onclick="formKapat()">İptal</button>
+    </form>
+  </div>
+</div>
+
+<div class="card card-primary">
+  <div class="card-header">
+    <h3 class="card-title"><i class="fas fa-list mr-2"></i>Tedarikçi Listesi</h3>
+  </div>
+  <div class="card-body table-responsive p-0">
+    <table class="table table-hover table-striped">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Firma Adı</th>
+          <th>İletişim Kişisi</th>
+          <th>Telefon</th>
+          <th>Adres</th>
+          <th>İşlem</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in tedarikciler %}
+        <tr>
+          <td>{{ t.tedarikci_id }}</td>
+          <td>{{ t.firma_adi }}</td>
+          <td>{{ t.iletisim_kisi }}</td>
+          <td>{{ t.firma_telefon }}</td>
+          <td>{{ t.firma_adres }}</td>
+          <td>
+            <button class="btn btn-sm btn-warning btn-action"
+              onclick="duzenle({{ t.tedarikci_id }}, '{{ t.firma_adi }}', '{{ t.iletisim_kisi }}', '{{ t.firma_telefon }}', '{{ t.firma_adres }}')">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-danger btn-action" onclick="sil({{ t.tedarikci_id }})">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function formAc() {
+    document.getElementById('formKart').style.display = 'block';
+    document.getElementById('formBaslik').innerText = 'Yeni Tedarikçi';
+    document.getElementById('tedarikcilForm').reset();
+    document.getElementById('tedarikci_id').value = '';
+  }
+
+  function formKapat() {
+    document.getElementById('formKart').style.display = 'none';
+  }
+
+  function kaydet() {
+    const tedarikci_id = document.getElementById('tedarikci_id').value;
+    const data = {
+      firma_adi: document.getElementById('firma_adi').value,
+      iletisim_kisi: document.getElementById('iletisim_kisi').value,
+      firma_telefon: document.getElementById('firma_telefon').value,
+      firma_adres: document.getElementById('firma_adres').value
+    };
+
+    const url = tedarikci_id ? '/tedarikci/guncelle/' + tedarikci_id : '/tedarikci/ekle';
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res.success) {
+        alert(tedarikci_id ? 'Tedarikçi güncellendi!' : 'Tedarikçi eklendi!');
+        location.reload();
+      } else {
+        alert('Hata: ' + res.message);
+      }
+    });
+  }
+
+  function duzenle(id, firma_adi, iletisim_kisi, firma_telefon, firma_adres) {
+    document.getElementById('formKart').style.display = 'block';
+    document.getElementById('formBaslik').innerText = 'Tedarikçi Güncelle';
+    document.getElementById('tedarikci_id').value = id;
+    document.getElementById('firma_adi').value = firma_adi;
+    document.getElementById('iletisim_kisi').value = iletisim_kisi;
+    document.getElementById('firma_telefon').value = firma_telefon;
+    document.getElementById('firma_adres').value = firma_adres;
+  }
+
+  function sil(id) {
+    if (confirm('Bu tedarikçiyi silmek istediğinize emin misiniz?')) {
+      fetch('/tedarikci/sil/' + id, { method: 'POST' })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          alert('Tedarikçi silindi!');
+          location.reload();
+        } else {
+          alert('Hata: ' + res.message);
+        }
+      });
+    }
+  }
+</script>
+{% endblock %}

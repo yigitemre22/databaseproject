@@ -31,7 +31,7 @@
     </a>
     <div class="sidebar">
       <nav class="mt-2">
-        <ul class="nav nav-pills nav-sidebar flex-column">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 
           <li class="nav-item">
             <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">
@@ -55,17 +55,19 @@
           </li>
 
           <li class="nav-item">
-            <a href="/malzemeler" class="nav-link {% if request.path == '/malzeme' %}active{% endif %}">
+            <a href="/malzemeler" class="nav-link {% if request.path == '/malzemeler' %}active{% endif %}">
               <i class="nav-icon fas fa-boxes"></i>
               <p>Malzemeler</p>
             </a>
           </li>
+
           <li class="nav-item">
             <a href="/malzeme_hareketleri" class="nav-link {% if request.path == '/malzeme_hareketleri' %}active{% endif %}">
               <i class="nav-icon fas fa-exchange-alt"></i>
               <p>Malzeme Hareketleri</p>
             </a>
           </li>
+
           <li class="nav-item has-treeview {% if request.path in ['/musteri', '/personel', '/tedarikci', '/urun'] %}menu-open{% endif %}">
             <a href="#" class="nav-link {% if request.path in ['/musteri', '/personel', '/tedarikci', '/urun'] %}active{% endif %}">
               <i class="nav-icon fas fa-cog"></i>
@@ -74,12 +76,12 @@
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="/urun" class="nav-link {% if request.path == '/urun' %}active{% endif %}">
-                  <i class="nav-icon fas fa-cake-candles"></i>
+                  <i class="nav-icon fas fa-birthday-cake"></i>
                   <p>Ürünler</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="/musteri" class="nav-link {% if request.path == '/musteri' %}active{% endif %}">
+                <a href="/musteriler" class="nav-link {% if request.path == '/musteri' %}active{% endif %}">
                   <i class="nav-icon fas fa-users"></i>
                   <p>Müşteriler</p>
                 </a>
