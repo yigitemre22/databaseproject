@@ -70,6 +70,7 @@
           <th>Adı</th>
           <th>Soyadı</th>
           <th>Telefon</th>
+          <th>Toplam Harcama</th>
           <th>İşlem</th>
         </tr>
       </thead>
@@ -80,6 +81,7 @@
           <td>{{ m.musteri_adi }}</td>
           <td>{{ m.musteri_soyadi }}</td>
           <td>{{ m.musteri_telefon }}</td>
+          <td>{{m.toplam_harcama}}</td>
           <td>
             <button class="btn btn-sm btn-warning btn-action"
               onclick="duzenle({{ m.musteri_id }}, '{{ m.musteri_adi }}', '{{ m.musteri_soyadi }}', '{{ m.musteri_telefon }}')">

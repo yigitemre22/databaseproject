@@ -85,6 +85,7 @@
           <th>Kar Oranı</th>
           <th>Stok</th>
           <th>Notlar</th>
+          <th>Kar</th>
           <th>İşlem</th>
         </tr>
       </thead>
@@ -98,6 +99,7 @@
           <td>%{{ u.kar_orani }}</td>
           <td>{{ u.stok }}</td>
           <td>{{ u.notlar }}</td>
+          <td>{{u.kar}}</td>
           <td>
             <button class="btn btn-sm btn-warning btn-action"
               onclick="duzenle({{ u.urun_id }}, '{{ u.urun_adi }}', {{ u.maliyet }}, {{ u.satis_fiyat }}, {{ u.kar_orani }}, {{ u.stok }}, '{{ u.notlar }}')">

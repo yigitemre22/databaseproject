@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Giriş - Pastahane Yönetim Sistemi{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Giriş sayfasında Sidebar ve Navbar'ı gizle */
+    body:not(.logged-in) .main-sidebar, 
+    body:not(.logged-in) .main-header,
+    body:not(.logged-in) .main-footer {
+        display: none !important;
+    }
+    
+    /* İçerik alanını tüm ekrana yay */
+    body:not(.logged-in) .content-wrapper {
+        margin-left: 0 !important;
+        background-color: #f4f6f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+    }
+    /* Giriş sayfasında breadcrumb ve başlık alanını tamamen gizle */
+body:not(.logged-in) .content-header {
+    display: none !important;
+}
+
+/* Sayfa içeriğinin (kartın) tam ortada kalmasını sağla */
+body:not(.logged-in) .content {
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+    /* Giriş Kartı Tasarımı */
+    .login-box { width: 400px; }
+    .card { border-radius: 15px; border-top: 5px solid #007bff; }
+    
+    .role-selection {
+        display: flex;
+        justify-content: space-around;
+        background: #eee;
+        padding: 5px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .role-selection input[type="radio"] { display: none; }
+    
+    .role-selection label {
+        flex: 1;
+        text-align: center;
+        padding: 8px;
+        cursor: pointer;
+        border-radius: 8px;
+        margin: 0;
+        transition: 0.3s;
+        font-weight: 600;
+        color: #555;
+    }
+
+    .role-selection input:checked + label {
+        background: #007bff;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-box">
+    <div class="card card-outline card-primary shadow-lg">
+        <div class="card-header text-center">
+            <h1 class="h1"><b>Pastahane</b>YS</h1>
+        </div>
+        <div class="card-body">
+            <p class="login-box-msg">Yönetici veya Personel olarak giriş yapın</p>
+
+            {% if error %}
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <i class="icon fas fa-ban"></i> {{ error }}
+            </div>
+            {% endif %}
+
+            <form action="{{ url_for('login') }}" method="post">
+                <div class="role-selection">
+                    <input type="radio" name="role_type" id="admin" value="admin" checked>
+                    <label for="admin"><i class="fas fa-user-shield"></i> Yönetici</label>
+                    
+                    <input type="radio" name="role_type" id="personel" value="personel">
+                    <label for="personel"><i class="fas fa-user"></i> Personel</label>
+                </div>
+
+                <div class="input-group mb-3">
+                    <input type="text" name="username" class="form-control" placeholder="Kullanıcı Adı" required>
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-user"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="password" name="password" class="form-control" placeholder="Şifre" required>
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-lock"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary btn-block">Giriş Yap</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

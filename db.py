@@ -11,3 +11,4 @@ def get_cursor():
     if not db.is_connected():
         db.reconnect()
     return db.cursor(dictionary=True)
+

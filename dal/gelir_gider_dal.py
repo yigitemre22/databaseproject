@@ -22,3 +22,26 @@ def gelir_gider_sil(kayit_id):
     cursor.callproc('gelir_gider_sil',[kayit_id])
     db.commit()
 
+# gelir_gider_dal.py dosyasına ekle
+def dashboard_verilerini_getir():
+    cursor = get_cursor()
+    cursor.callproc('sp_dashboard_verileri')
+    sonuclar = []
+    # Birden fazla SELECT sonucu (Satışlar ve Stoklar) olduğu için stored_results kullanılır
+    for result in cursor.stored_results():
+        sonuclar.append(result.fetchall())
+    return sonuclar
+
+def son_satisları_getir():
+    cursor = get_cursor()
+    cursor.callproc('sp_son_satislar')
+    for result in cursor.stored_results():
+        return result.fetchall()
+    return []
+
+def dusuk_stoklari_getir():
+    cursor = get_cursor()
+    cursor.callproc('sp_dusuk_stok_uyarisi')
+    for result in cursor.stored_results():
+        return result.fetchall()
+    return []

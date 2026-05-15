@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Kasa Detayları{% endblock %}
+{% block breadcrumb %}Kasa{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-success card-outline">
+            <div class="card-header">
+                <h3 class="card-title">Genel Gelir/Gider Dökümü</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>İşlem Tipi</th>
+                            <th>Açıklama</th>
+                            <th>Tutar</th>
+                            <th>Tarih</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for islem in islemler %}
+                        <tr>
+                            <td>
+                                {% if islem.tip == 'Gelir' %}
+                                    <span class="badge badge-success">Gelir</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Gider</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ islem.aciklama }}</td>
+                            <td>{{ islem.tutar }} TL</td>
+                            <td>{{ islem.tarih }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
