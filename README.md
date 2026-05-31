@@ -38,7 +38,7 @@ pip install -r requirements.txt
 
 ## Projeyi Çalıştırma
 
-Tüm bağımlılıklar kurulduktan sonra proje aşağıdaki şekilde çalıştırılabilir.
+db.py adlı dosyadan kullanıcı adı ve şifrenizi değiştirin.
 
 ### Visual Studio Code
 
