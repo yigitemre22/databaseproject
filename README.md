@@ -43,7 +43,7 @@ Tüm bağımlılıklar kurulduktan sonra proje aşağıdaki şekilde çalıştı
 ### Visual Studio Code
 
 1. Projeyi VS Code ile açın.
-2. `proje.py` dosyasını açın.
+2. `project.py` dosyasını açın.
 3. F5 tuşuna basarak projeyi çalıştırın.
 
 ---
