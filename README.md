@@ -38,7 +38,7 @@ pip install -r requirements.txt
 
 ## Projeyi Çalıştırma
 
-db.py adlı dosyadan kullanıcı adı ve şifrenizi değiştirin.
+db.py adlı dosyadan mysql de kullandığınız kullanıcı adı ve şifrenizi giriniz.
 
 ### Visual Studio Code
 
